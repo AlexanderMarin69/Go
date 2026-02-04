@@ -148,17 +148,29 @@ func CachingMiddleware(cache *ResponseCache, log *zap.Logger) func(next http.Han
 				}
 				w.Header().Add("X-Cache", "HIT")
 				w.WriteHeader(cached.StatusCode)
-				w.Write(cached.Body)
+
+				// Inject cache status into cached response body
+				body := string(cached.Body)
+				if len(body) > 0 && body[len(body)-1] == '}' {
+					body = body[:len(body)-1] + `,"cached":true}`
+				}
+				w.Write([]byte(body))
 				return
 			}
 
-			// Wrap response writer to capture response
+			// Wrap response writer to capture response for caching
 			wrappedWriter := &cachedResponseWriter{
 				ResponseWriter: w,
 				statusCode:     http.StatusOK,
 			}
 
-			next.ServeHTTP(wrappedWriter, r)
+			// Wrap with cache status interceptor (for first-time hits)
+			interceptor := &cacheInterceptorWriter{
+				ResponseWriter: wrappedWriter,
+				isCached:       false,
+			}
+
+			next.ServeHTTP(interceptor, r)
 
 			// Cache successful GET responses (2xx status codes)
 			if wrappedWriter.statusCode >= 200 && wrappedWriter.statusCode < 300 {
@@ -195,4 +207,24 @@ func (rw *cachedResponseWriter) WriteHeader(statusCode int) {
 		rw.written = true
 	}
 	rw.ResponseWriter.WriteHeader(statusCode)
+}
+
+// cacheInterceptorWriter intercepts writes to inject cache status
+type cacheInterceptorWriter struct {
+	http.ResponseWriter
+	isCached bool
+	written  bool
+}
+
+func (w *cacheInterceptorWriter) Write(b []byte) (int, error) {
+	if !w.written {
+		// Inject cache status into the response body for first write
+		body := string(b)
+		if len(body) > 0 && body[len(body)-1] == '}' {
+			body = body[:len(body)-1] + `,"cached":false}`
+			b = []byte(body)
+		}
+		w.written = true
+	}
+	return w.ResponseWriter.Write(b)
 }

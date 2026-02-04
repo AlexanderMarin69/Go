@@ -18,7 +18,7 @@ func RegisterUserRoutes(r chi.Router) {
 
 // Handlers
 func listUsers(w http.ResponseWriter, r *http.Request) {
-	writeSuccess(w, http.StatusOK, "list all users")
+	writeSuccessWithRequest(w, r, http.StatusOK, "list all users")
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +27,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 func getUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	writeSuccessWithID(w, http.StatusOK, "get user", id)
+	writeSuccessWithIDAndRequest(w, r, http.StatusOK, "get user", id)
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {

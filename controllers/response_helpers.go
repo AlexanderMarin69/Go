@@ -17,8 +17,20 @@ func writeSuccess(w http.ResponseWriter, statusCode int, message string) {
 	writeResponse(w, statusCode, `{"message":"`+message+`"}`)
 }
 
+// writeSuccessWithRequest writes a success response with message and cache status injected by middleware
+func writeSuccessWithRequest(w http.ResponseWriter, r *http.Request, statusCode int, message string) {
+	// The caching middleware will inject cache status automatically
+	writeResponse(w, statusCode, `{"message":"`+message+`"}`)
+}
+
 // writeSuccessWithID writes a success response with a message and ID
 func writeSuccessWithID(w http.ResponseWriter, statusCode int, message string, id string) {
+	writeResponse(w, statusCode, `{"message":"`+message+`","id":"`+id+`"}`)
+}
+
+// writeSuccessWithIDAndRequest writes a success response with message, ID, and cache status
+func writeSuccessWithIDAndRequest(w http.ResponseWriter, r *http.Request, statusCode int, message string, id string) {
+	// The caching middleware will inject cache status automatically
 	writeResponse(w, statusCode, `{"message":"`+message+`","id":"`+id+`"}`)
 }
 
