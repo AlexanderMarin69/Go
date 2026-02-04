@@ -1,6 +1,7 @@
-# Go Web App - Production-Ready API Server
+# Go Web App - .NET like DIY API Server
 
-A modern, idiomatic Go web application built with production standards, concurrent architecture, and RESTful API design. Structured for scalability and maintainability with clear separation of concerns.
+Learning about Go server code coming from .NET.
+**Trying to** make modern, idiomatic Go web application built with production standards, concurrent architecture, and RESTful API design. Structured for scalability and maintainability with clear separation of concerns.
 
 ## Table of Contents
 
