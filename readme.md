@@ -130,6 +130,7 @@ Press `Ctrl+C` to gracefully shut down the server. The server will complete in-f
 ### Quick Setup
 
 1. Open Postman
+(1.5 - import postman collection from this github repo)
 2. Create a new request
 3. Use the following examples:
 
@@ -247,4 +248,4 @@ writeSuccessWithCacheStatus(w, http.StatusOK, message, false)
 - ... and more
 
 
-### 3. Import postman collection from this github repo and test it on port 8080
+
