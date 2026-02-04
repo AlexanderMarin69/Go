@@ -22,16 +22,17 @@ A modern, idiomatic Go web application built with production standards, concurre
 ├── main.go                  # Server entry point, graceful shutdown
 ├── config.json              # Application configuration (server, rate limit, cache)
 ├── go.mod                   # Module dependencies
+├── cache/
+│   └── cache.go            # Cache service with DI (Get, Set, Contains, Remove, Clear)
 ├── config/
 │   └── config.go           # Configuration loading and defaults
 ├── logger/
 │   └── logger.go           # Structured logging setup (Zap)
 ├── middleware/
 │   ├── logging.go          # HTTP request logging middleware
-│   ├── rate_limit.go       # Rate limiting middleware with token bucket
-│   └── cache.go            # Response caching middleware with TTL
+│   └── rate_limit.go       # Rate limiting middleware with token bucket
 ├── controllers/
-│   ├── user_controller.go      # User API v1 endpoints
+│   ├── user_controller.go      # User API v1 endpoints with cache logic
 │   ├── response_helpers.go     # Shared response helper functions
 │   ├── user_v2_controller.go   # User API v2 endpoints
 │   └── product_controller.go   # Product API v1 endpoints
@@ -183,13 +184,39 @@ Compare responses from:
 - **Concurrent Safe** - Thread-safe rate limiting using Go's token bucket
 
 ### ✅ Section 3: Response Caching
-- **GET Request Caching** - Automatic caching of successful GET responses (2xx status codes)
+- **Dependency Injection** - Cache service injected into controllers for explicit control
+- **Manual Cache Logic** - Handlers control exactly when/what to cache (like .NET)
 - **TTL Support** - Configurable cache time-to-live (default: 5 minutes)
 - **LRU Eviction** - Oldest entries removed when cache reaches max size
-- **Background Cleanup** - Periodic cleanup of expired cache entries
-- **Cache Headers** - `X-Cache: HIT` header indicates cached responses
-- **Configurable** - Enable/disable and adjust TTL/size via `config.json`
+- **Background Cleanup** - Periodic cleanup of expired cache entries (every 1 minute)
 - **Thread-Safe** - Concurrent-safe caching using sync.RWMutex
+- **Rich API** - Get(), Set(), Contains(), Remove(), Clear() methods
+- **JSON Support** - GetJSON() and SetJSON() for automatic serialization
+- **Configurable** - Enable/disable and adjust TTL/size via `config.json`
+- **Cache Status** - Response includes `"cached": true/false` field
+
+### Example: Using Cache in Handlers
+
+```go
+// In your handler with cache service injected
+if cacheService != nil {
+    // Try to get from cache
+    if cached, ok := cacheService.Get("users:list"); ok {
+        writeSuccessWithCacheStatus(w, http.StatusOK, cached.(string), true)
+        return
+    }
+}
+
+// Not in cache, generate response
+message := "list all users"
+
+// Store in cache for next time
+if cacheService != nil {
+    cacheService.Set("users:list", message)
+}
+
+writeSuccessWithCacheStatus(w, http.StatusOK, message, false)
+```
 
 ## Configuration
 
