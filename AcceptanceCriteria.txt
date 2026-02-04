@@ -4,6 +4,7 @@ We will build fully, to the best production environment standards in mind, fail 
 We will keep syntax correct, memore and performance efficient, and easy to read for new joiners.
 In everything we do, we shall take advantage of Go's multi thread and concurrency capabilities to improve performance.
 We will create and use helper functions instead of repeating code across the file(s).
+After making any changes, check readme for the category of change we made, if it changes running/setup steps, update the readme - if we add new features then also update the readme.
 
 ---
 
