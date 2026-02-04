@@ -107,23 +107,12 @@ Press `Ctrl+C` to gracefully shut down the server. The server will complete in-f
 ### Health Check
 - **GET** `/health` - Server health status
 
-### API v1 - User Endpoints
+### API v1 - User Endpoints (Version support(!))
 - **GET** `/api/v1/users` - List all users
 - **POST** `/api/v1/users` - Create new user (Returns 201)
 - **GET** `/api/v1/users/{id}` - Get user by ID
 - **PUT** `/api/v1/users/{id}` - Update user by ID
 - **DELETE** `/api/v1/users/{id}` - Delete user (Returns 400 for testing)
-
-### API v1 - Product Endpoints
-- **GET** `/api/v1/products` - List all products
-- **POST** `/api/v1/products` - Create new product (Returns 201)
-- **GET** `/api/v1/products/{id}` - Get product by ID
-- **PUT** `/api/v1/products/{id}` - Update product by ID
-- **DELETE** `/api/v1/products/{id}` - Delete product (Returns 400 for testing)
-
-### API v2 - User Endpoints (Enhanced Format)
-- **GET** `/api/v2/users` - List all users (v2 format with pagination)
-- **GET** `/api/v2/users/{id}` - Get user by ID (v2 format)
 
 ## Testing with Postman
 
