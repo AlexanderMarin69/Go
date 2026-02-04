@@ -17,10 +17,13 @@ func writeSuccess(w http.ResponseWriter, statusCode int, message string) {
 	writeResponse(w, statusCode, `{"message":"`+message+`"}`)
 }
 
-// writeSuccessWithRequest writes a success response with message and cache status injected by middleware
-func writeSuccessWithRequest(w http.ResponseWriter, r *http.Request, statusCode int, message string) {
-	// The caching middleware will inject cache status automatically
-	writeResponse(w, statusCode, `{"message":"`+message+`"}`)
+// writeSuccessWithCacheStatus writes a success response with cache status
+func writeSuccessWithCacheStatus(w http.ResponseWriter, statusCode int, message string, cached bool) {
+	cacheVal := "false"
+	if cached {
+		cacheVal = "true"
+	}
+	writeResponse(w, statusCode, `{"message":"`+message+`","cached":`+cacheVal+`}`)
 }
 
 // writeSuccessWithID writes a success response with a message and ID
@@ -28,10 +31,13 @@ func writeSuccessWithID(w http.ResponseWriter, statusCode int, message string, i
 	writeResponse(w, statusCode, `{"message":"`+message+`","id":"`+id+`"}`)
 }
 
-// writeSuccessWithIDAndRequest writes a success response with message, ID, and cache status
-func writeSuccessWithIDAndRequest(w http.ResponseWriter, r *http.Request, statusCode int, message string, id string) {
-	// The caching middleware will inject cache status automatically
-	writeResponse(w, statusCode, `{"message":"`+message+`","id":"`+id+`"}`)
+// writeSuccessWithIDAndCacheStatus writes a success response with message, ID, and cache status
+func writeSuccessWithIDAndCacheStatus(w http.ResponseWriter, statusCode int, message string, id string, cached bool) {
+	cacheVal := "false"
+	if cached {
+		cacheVal = "true"
+	}
+	writeResponse(w, statusCode, `{"message":"`+message+`","id":"`+id+`","cached":`+cacheVal+`}`)
 }
 
 // writeError writes an error response with a message and status code

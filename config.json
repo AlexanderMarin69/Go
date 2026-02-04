@@ -7,8 +7,8 @@
   },
   "rateLimit": {
     "enabled": true,
-    "requestsPerSec": 100,
-    "burstSize": 10
+    "requestsPerSec": 1,
+    "burstSize": 1
   },
   "cache": {
     "enabled": true,

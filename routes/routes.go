@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
+	"am.com/gowebapp/cache"
 	"am.com/gowebapp/config"
 	"am.com/gowebapp/controllers"
 	"am.com/gowebapp/middleware"
@@ -23,10 +24,10 @@ func NewRouter(log *zap.Logger, cfg *config.Config) *chi.Mux {
 		r.Use(middleware.RateLimitMiddleware(log, cfg.RateLimit.RequestsPerSec, cfg.RateLimit.BurstSize))
 	}
 
-	// Response caching middleware (if enabled)
+	// Create cache service (if enabled)
+	var cacheService *cache.Service
 	if cfg.Cache.Enabled {
-		cache := middleware.NewResponseCache(cfg.Cache.MaxSize, cfg.Cache.TTL, log)
-		r.Use(middleware.CachingMiddleware(cache, log))
+		cacheService = cache.NewService(cfg.Cache.TTL, cfg.Cache.MaxSize)
 	}
 
 	// Health check endpoint
@@ -34,7 +35,7 @@ func NewRouter(log *zap.Logger, cfg *config.Config) *chi.Mux {
 
 	// API v1 routes
 	v1 := chi.NewRouter()
-	controllers.RegisterUserRoutes(v1)
+	controllers.RegisterUserRoutes(v1, cacheService)
 	r.Mount("/api/v1", v1)
 
 	return r
