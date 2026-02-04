@@ -20,13 +20,19 @@ A modern, idiomatic Go web application built with production standards, concurre
 
 ```
 ├── main.go                  # Server entry point, graceful shutdown
+├── config.json              # Application configuration (server, rate limit, cache)
 ├── go.mod                   # Module dependencies
+├── config/
+│   └── config.go           # Configuration loading and defaults
 ├── logger/
 │   └── logger.go           # Structured logging setup (Zap)
 ├── middleware/
-│   └── logging.go          # HTTP request logging middleware
+│   ├── logging.go          # HTTP request logging middleware
+│   ├── rate_limit.go       # Rate limiting middleware with token bucket
+│   └── cache.go            # Response caching middleware with TTL
 ├── controllers/
 │   ├── user_controller.go      # User API v1 endpoints
+│   ├── response_helpers.go     # Shared response helper functions
 │   ├── user_v2_controller.go   # User API v2 endpoints
 │   └── product_controller.go   # Product API v1 endpoints
 ├── routes/
@@ -42,21 +48,46 @@ A modern, idiomatic Go web application built with production standards, concurre
 go mod download
 ```
 
-### 2. Run the Server
+### 2. Configure the Application (Optional)
+
+Edit `config.json` to customize server settings:
+
+```json
+{
+  "server": {
+    "port": ":8080",
+    "readTimeout": "15s",
+    "writeTimeout": "15s",
+    "idleTimeout": "60s"
+  },
+  "rateLimit": {
+    "enabled": true,
+    "requestsPerSec": 100,
+    "burstSize": 10
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": "5m",
+    "maxSize": 1000
+  }
+}
+```
+
+### 3. Run the Server
 
 ```bash
 go run main.go
 ```
 
-The server will start on `http://localhost:8080`
+The server will start on `http://localhost:8080` (or custom port from config)
 
 You should see output similar to:
 ```
 {"level":"info","ts":1707000000.000000,"caller":"main.go:22","msg":"starting web server"}
-{"level":"info","ts":1707000000.000001,"caller":"main.go:33","msg":"listening on address","addr":":8080"}
+{"level":"info","ts":1707000000.000001,"caller":"main.go:42","msg":"listening on address","addr":":8080"}
 ```
 
-### 3. Health Check
+### 4. Health Check
 
 Verify the server is running:
 ```bash
@@ -65,7 +96,7 @@ curl http://localhost:8080/health
 
 Expected response: `{"status":"ok"}`
 
-### 4. Graceful Shutdown
+### 5. Graceful Shutdown
 
 Press `Ctrl+C` to gracefully shut down the server. The server will complete in-flight requests within 5 seconds.
 
@@ -142,32 +173,50 @@ Compare responses from:
 - **Middleware Architecture** - Extensible middleware system (logging implemented)
 - **Graceful Shutdown** - Proper signal handling and server shutdown
 - **Error Handling** - Structured error responses with status codes
+- **Response Helpers** - Reusable helper functions for consistent response formatting
+
+### ✅ Section 2: Rate Limiting
+- **Token Bucket Algorithm** - Configurable requests per second and burst size
+- **Configurable** - Enable/disable and adjust limits via `config.json`
+- **429 Status Responses** - Proper HTTP status codes for rate limit exceeded
+- **Structured Logging** - Logs rate limit violations with IP and path information
+- **Concurrent Safe** - Thread-safe rate limiting using Go's token bucket
+
+### ✅ Section 3: Response Caching
+- **GET Request Caching** - Automatic caching of successful GET responses (2xx status codes)
+- **TTL Support** - Configurable cache time-to-live (default: 5 minutes)
+- **LRU Eviction** - Oldest entries removed when cache reaches max size
+- **Background Cleanup** - Periodic cleanup of expired cache entries
+- **Cache Headers** - `X-Cache: HIT` header indicates cached responses
+- **Configurable** - Enable/disable and adjust TTL/size via `config.json`
+- **Thread-Safe** - Concurrent-safe caching using sync.RWMutex
+
+## Configuration
+
+### config.json Structure
+
+- **server.port** - Server listen address (default: `:8080`)
+- **server.readTimeout** - HTTP read timeout (default: `15s`)
+- **server.writeTimeout** - HTTP write timeout (default: `15s`)
+- **server.idleTimeout** - HTTP idle timeout (default: `60s`)
+- **rateLimit.enabled** - Enable/disable rate limiting (default: `true`)
+- **rateLimit.requestsPerSec** - Allowed requests per second (default: `100`)
+- **rateLimit.burstSize** - Burst capacity for token bucket (default: `10`)
+- **cache.enabled** - Enable/disable response caching (default: `true`)
+- **cache.ttl** - Cache entry time-to-live (default: `5m`)
+- **cache.maxSize** - Maximum number of cached entries (default: `1000`)
 
 ## Dependencies
 
 - `github.com/go-chi/chi/v5` - HTTP router and middleware framework
 - `go.uber.org/zap` - Structured logging library
+- `golang.org/x/time` - Token bucket rate limiting
 
 ## Next Steps (Future Sections)
 
-- Section 2: Rate Limiting
-- Section 3: Caching
 - Section 4: Authentication & Authorization
 - Section 5: Database / ORM
 - ... and more
 
 
-### 1. Download Dependencies
-```bash
-go mod download
-```
-
-### 2. Run the Server
-```bash
-go run main.go
-```
-
-
 ### 3. Import postman collection from this github repo and test it on port 8080
-
-

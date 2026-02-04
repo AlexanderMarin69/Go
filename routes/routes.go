@@ -6,16 +6,28 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
+	"am.com/gowebapp/config"
 	"am.com/gowebapp/controllers"
 	"am.com/gowebapp/middleware"
 )
 
 // NewRouter creates and configures the main router with all routes
-func NewRouter(log *zap.Logger) *chi.Mux {
+func NewRouter(log *zap.Logger, cfg *config.Config) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Global middleware
 	r.Use(middleware.LoggingMiddleware(log))
+
+	// Rate limiting middleware (if enabled)
+	if cfg.RateLimit.Enabled {
+		r.Use(middleware.RateLimitMiddleware(log, cfg.RateLimit.RequestsPerSec, cfg.RateLimit.BurstSize))
+	}
+
+	// Response caching middleware (if enabled)
+	if cfg.Cache.Enabled {
+		cache := middleware.NewResponseCache(cfg.Cache.MaxSize, cfg.Cache.TTL, log)
+		r.Use(middleware.CachingMiddleware(cache, log))
+	}
 
 	// Health check endpoint
 	r.Get("/health", healthCheck)

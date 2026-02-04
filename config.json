@@ -1,0 +1,18 @@
+{
+  "server": {
+    "port": ":8080",
+    "readTimeout": "15s",
+    "writeTimeout": "15s",
+    "idleTimeout": "60s"
+  },
+  "rateLimit": {
+    "enabled": true,
+    "requestsPerSec": 100,
+    "burstSize": 10
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": "5m",
+    "maxSize": 1000
+  }
+}

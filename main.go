@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"am.com/gowebapp/config"
 	"am.com/gowebapp/logger"
 	"am.com/gowebapp/routes"
 	"go.uber.org/zap"
@@ -25,16 +26,22 @@ func main() {
 
 	log.Info("starting web server")
 
-	// Initialize router with routes
-	router := routes.NewRouter(log)
+	// Load configuration
+	cfg, err := config.LoadConfig("config.json")
+	if err != nil {
+		log.Fatal("failed to load configuration", zap.Error(err))
+	}
 
-	// Server configuration
+	// Initialize router with routes
+	router := routes.NewRouter(log, cfg)
+
+	// Server configuration from config file
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         cfg.Server.Port,
 		Handler:      router,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
 	// Start server in goroutine
