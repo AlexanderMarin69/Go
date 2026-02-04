@@ -3,23 +3,8 @@ package cache
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
 	"time"
 )
-
-// Entry represents a cached item with expiration
-type Entry struct {
-	Value     interface{}
-	ExpiresAt time.Time
-}
-
-// Service provides caching operations with TTL support
-type Service struct {
-	mu      sync.RWMutex
-	storage map[string]*Entry
-	ttl     time.Duration
-	maxSize int
-}
 
 // NewService creates a new cache service
 func NewService(ttl time.Duration, maxSize int) *Service {

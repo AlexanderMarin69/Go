@@ -24,12 +24,15 @@ Learning about Go server code coming from .NET.
 ├── config.json              # Application configuration (server, rate limit, cache)
 ├── go.mod                   # Module dependencies
 ├── cache/
-│   └── cache.go            # Cache service with DI (Get, Set, Contains, Remove, Clear)
+│   ├── types.go            # Cache service types (Entry, Service structs)
+│   └── cache.go            # Cache service implementation (Get, Set, Contains, Remove, Clear)
 ├── config/
-│   └── config.go           # Configuration loading and defaults
+│   ├── types.go            # Configuration types (Config, ServerConfig, RateLimit, Cache structs)
+│   └── config.go           # Configuration loading and parsing logic
 ├── logger/
 │   └── logger.go           # Structured logging setup (Zap)
 ├── middleware/
+│   ├── types.go            # Middleware types (responseWriter struct)
 │   ├── logging.go          # HTTP request logging middleware
 │   └── rate_limit.go       # Rate limiting middleware with token bucket
 ├── controllers/
