@@ -23,13 +23,7 @@ func NewRouter(log *zap.Logger) *chi.Mux {
 	// API v1 routes
 	v1 := chi.NewRouter()
 	controllers.RegisterUserRoutes(v1)
-	controllers.RegisterProductRoutes(v1)
 	r.Mount("/api/v1", v1)
-
-	// API v2 routes (example of versioning)
-	v2 := chi.NewRouter()
-	controllers.RegisterUserV2Routes(v2)
-	r.Mount("/api/v2", v2)
 
 	return r
 }

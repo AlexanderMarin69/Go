@@ -143,17 +143,6 @@ Compare responses from:
 - **Graceful Shutdown** - Proper signal handling and server shutdown
 - **Error Handling** - Structured error responses with status codes
 
-### 🔄 Concurrency & Performance
-- Goroutine-based server startup and request handling
-- Non-blocking HTTP server with timeouts
-- Efficient request logging without blocking
-
-### 📋 Code Quality
-- Production-ready error handling
-- Helper functions for route registration (DRY principle)
-- Idiomatic Go naming and patterns
-- Easy onboarding for new developers
-
 ## Dependencies
 
 - `github.com/go-chi/chi/v5` - HTTP router and middleware framework
@@ -167,6 +156,18 @@ Compare responses from:
 - Section 5: Database / ORM
 - ... and more
 
----
 
-**Built with Go best practices and production standards in mind.**
+### 1. Download Dependencies
+```bash
+go mod download
+```
+
+### 2. Run the Server
+```bash
+go run main.go
+```
+
+
+### 3. Import postman collection from this github repo and test it on port 8080
+
+
